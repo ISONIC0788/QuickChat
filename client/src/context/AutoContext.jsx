@@ -26,12 +26,71 @@ export const AutoProvider = ({children}) =>{
 
      const checkAuth = async () =>{
         try {
-          const {data} =   await axios.get("/api/auth/check") // for api call to check if user auth 
+          const {data} =   await axios.post("/api/auth/check") // for api call to check if user auth 
           if(data.success){
                 setAuthUser(data.user);
+                connectSocket(data.user);
           }
         } catch (error) {
             toast.error(error.message)
+        }
+     }
+
+
+     // login function to handle user authentication and socket connnection 
+
+     const login  = async(state ,credentials) =>{
+        try{
+            // addition of api call 
+            const {data } = await axios.post(`/api/auth/${state}`, credentials);
+            if(data.success){
+                setAuthUser(data.userData);
+                connectSocket(data.userData)
+                axios.defaults.headers.common["token"] = data.token;
+                setToken(data.token);
+                // to add it in local storate 
+
+                localStorage.setItem('token', data.token);
+                toast.success(data.message);
+
+            }else{
+                toast.error(data.message);
+            }
+
+
+        }catch(error){
+               toast.error(error.message);
+        }
+
+     }
+
+     // logout function to handle user logout and socket  disconnec 
+
+     const logout  = async ()  =>{
+        localStorage.removeItem("token");
+        setToken(null);
+        setAuthUser(null);
+        setOnlineUser([]);
+
+        axios.defaults.headers.common["token"] = null ;
+
+        toast.success("logged out success full")
+
+        socket.disconnect();
+
+     }
+
+     // update profile function to handler user profile update
+
+     const updateProfile = async (body) =>{
+        try {
+            const {data}  =  await axios.put('/api/auth/update-profile' , body)
+            if(data.success){
+                setAuthUser(data.user);
+                toast.success("Profile update successfully ");
+            }
+        } catch (error) {
+            toast.error(error.message);
         }
      }
 
@@ -56,6 +115,11 @@ export const AutoProvider = ({children}) =>{
      }
 
 
+     // connect socket function to handle socket  connection and online user updates
+    //  const connectSocket = (userData) =>{
+    //      if(!userData || socket?.conneted) return;
+    //  }
+
      useEffect(() =>{
            if(token){
                  axios.defaults.headers.common["token"]  = token // here  we add token 
@@ -70,7 +134,10 @@ export const AutoProvider = ({children}) =>{
          axios,
          authUser,
          onlineUser,
-         socket
+         socket,
+         login,
+         logout,
+         updateProfile
     }
 
     return (

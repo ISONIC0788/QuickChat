@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import assets from '../assets/assets'
+import { AutoContext } from '../context/AutoContext';
 
 function LoginPages() {
   const [currState , setCurrState] = useState("Sign up");
@@ -9,6 +10,9 @@ function LoginPages() {
   const [bio , setBio] = useState("");
   const [isDataSubmitted , setIsDataSubmitted] = useState(false);
 
+  
+  const {login} = useContext(AutoContext)
+
   const onSubmitHandler = (event) =>{
       event.preventDefault();
 
@@ -16,6 +20,8 @@ function LoginPages() {
         setIsDataSubmitted(true);
          return;
       }
+      // add login function 
+      login(currState === "Sign up" ? 'signup': 'login' , {fullName, email , password , bio}) //allow to sed data 
   }
   return (
     <div className='min-h-screen bg-cover bg-center flex items-center justify-center gap-8 sm:justify-evenly 
