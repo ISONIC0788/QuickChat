@@ -84,15 +84,30 @@ export const AutoProvider = ({children}) =>{
 
      const updateProfile = async (body) =>{
         try {
-            const {data}  =  await axios.put('/api/auth/update-profile' , body)
+        const {data}  =  await axios.put('/api/auth/update-profile' , body ,
+                        {
+                  headers: {
+                   Authorization: `Bearer ${localStorage.getItem("token")}`
+                    }
+                        }
+         )
             if(data.success){
                 setAuthUser(data.user);
                 toast.success("Profile update successfully ");
             }
+
+            // console.log(data);
+
+
         } catch (error) {
             toast.error(error.message);
         }
      }
+
+     /*
+     ,{headers: {Authorization:localStorage.getItem('token') } }
+     */
+
 
      // connect socket function to handle socket  connection and online user updates
 
@@ -116,13 +131,13 @@ export const AutoProvider = ({children}) =>{
 
 
      // connect socket function to handle socket  connection and online user updates
-    //  const connectSocket = (userData) =>{
-    //      if(!userData || socket?.conneted) return;
-    //  }
+   
 
      useEffect(() =>{
            if(token){
-                 axios.defaults.headers.common["token"]  = token // here  we add token 
+                //  axios.defaults.headers.common["token"]  = token ; // here  we add token 
+                axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
            }
 
            // allow  to excute check auth 
@@ -137,7 +152,7 @@ export const AutoProvider = ({children}) =>{
          socket,
          login,
          logout,
-         updateProfile
+         updateProfile,
     }
 
     return (

@@ -1,23 +1,48 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 
 import { useNavigate } from 'react-router-dom'
 import assets from '../assets/assets';
+import { AutoContext } from '../context/AutoContext';
+import toast from 'react-hot-toast';
 
 
 function ProfilePage() {
+
+  const {authUser , updateProfile} = useContext(AutoContext);
  
   const [selectImg , setSelectedImg] = useState(null);
 
   const navigate  = useNavigate();
 
-  const [name, setName] = useState("Ebedi Meleck ");
+  const [name, setName] = useState(authUser.fullName);
 
-  const [bio , setBio ] = useState("Hey Every body I'm using quick chat   ")
+  const [bio , setBio ] = useState(authUser.bio)
 
   const handleSubmit = async (e) =>{
     // for preventing null data submision 
     e.preventDefault();
-    navigate('/')
+
+    // check whether there selected image 
+    if(!selectImg){
+         await updateProfile({fullName: name , bio })     
+         navigate('/')
+         return;
+    }
+
+    // allow to convert image into base 64 
+
+    const reader = new FileReader();
+
+    reader.readAsDataURL(selectImg);
+    reader.onload =  async () =>{
+        const base64Image = reader.result;
+        await updateProfile({profilePic: base64Image , fullName: name , bio , })
+        navigate('/');
+    }
+    reader.onerror = () => {
+      toast.error("Failed to read image file.");
+};
+
 
   }
 
@@ -49,7 +74,10 @@ function ProfilePage() {
               <button type="submit" className='py-3 bg-gradient-to-r from-purple-400 to-violet-600
                 text-white border-none text-sm font-light py-2 px-20 rounded-full cursor-pointer'>Save</button>
            </form>
-           <img className='max-w-44 aspect-square rounded-full max-10 max-sm:mt-10' src={assets.logo_icon} alt="" srcset="" />
+           <img className={`max-w-44 aspect-square rounded-full max-10 max-sm:mt-10
+            ${selectImg && 'rounded-full'}`} src={assets.logo_icon} alt="" srcset="" />
+
+            {/* {toast.error(localStorage.getItem('error'))} */}
         </div>
     </div>
   )

@@ -6,9 +6,25 @@ import jwt from "jsonwebtoken"
 
 export const protectRoute = async (req , res , next ) =>{
     try {
-        const token = req.headers.token;
+        // const token = req.headers.token;
 
-        const decoded = jwt.verify(token , process.env.JWT_SECRET);
+        /**
+         * som corrected code 
+         * 
+         */
+
+        /*
+        const authHeader =  req.headers.authorization;
+         const token = authHeader && authHeader.split(' ')[1];
+         if (!token) return res.json({ success: false, message: "jwt must be provided" });
+         
+        */
+          const authHeader = req.headers.authorization;
+          const token = authHeader && authHeader.split(' ')[1]; // Get the token part
+          if (!token) return res.json({ success: false, message: "JWT must be provided" });
+
+
+        const decoded = await jwt.verify(token , process.env.JWT_SECRET);
 
         const user = await User.findById(decoded.userId).select('-password');
 
@@ -24,6 +40,7 @@ export const protectRoute = async (req , res , next ) =>{
     } catch (error) {
           // for error handling 
         console.log(error.message);
+        console.log("error in auth middleware");
         res.json({success: false ,message :error.message});
     }
 }
