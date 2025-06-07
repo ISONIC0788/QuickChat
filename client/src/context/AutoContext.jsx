@@ -86,9 +86,9 @@ export const AutoProvider = ({children}) =>{
         try {
         const {data}  =  await axios.put('/api/auth/update-profile' , body ,
                         {
-                  headers: {
-                   Authorization: `Bearer ${localStorage.getItem("token")}`
-                    }
+                          headers: {
+                           Authorization: `Bearer ${localStorage.getItem("token")}`
+                          }
                         }
          )
             if(data.success){

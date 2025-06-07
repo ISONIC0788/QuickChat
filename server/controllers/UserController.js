@@ -53,31 +53,38 @@ export const signup = async (req , res)=>{
 
 // controller to login a user 
 
-export  const  login = async (req , res ) =>{
-    try {
-        
-       const {email , password} = req.body ;
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-       // for finding email if exist 
-       const userData = await User.findOne({email})
+    // check if user exists
+    const userData = await User.findOne({ email });
 
-       // for comparing password
-       const isPasswordCorrect  = await bcrypt.compare(password , userData.password);
-
-       if(!isPasswordCorrect){
-
-           return res.json({success:false , message : "Invalid credential "})
-       }
-
-       const token = generateToken(userData._id);
-
-       res.json({success: true , userData : newUser , token , message: "Account Created success fully "});
-
-    } catch (error) {
-          console.log(error.message);
-       res.json({success: false , message: error.message});
+    // if user not found, return error
+    if (!userData) {
+      return res.json({ success: false, message: "Invalid credentials (email not found)" });
     }
-} 
+
+    // compare password
+    const isPasswordCorrect = await bcrypt.compare(password, userData.password);
+    if (!isPasswordCorrect) {
+      return res.json({ success: false, message: "Invalid credentials (wrong password)" });
+    }
+
+    const token = generateToken(userData._id);
+    res.json({
+      success: true,
+      userData,
+      token,
+      message: "Login successful"
+    });
+
+  } catch (error) {
+    console.log(error.message);
+    res.json({ success: false, message: error.message });
+  }
+}
+
 
 
 // controller to check if user is authenticated or not 
