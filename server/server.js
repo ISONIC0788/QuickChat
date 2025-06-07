@@ -63,7 +63,7 @@ app.use(cors());
 app.use("/api/status", (req , res ) => res.send("Server is live"))
 app.use("/api/auth" , userRoutes)
 
-app.use("api/messages" , messageRoutes)
+app.use("/api/messages" , messageRoutes)
 
 // connect to mongo db 
 

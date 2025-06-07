@@ -6,12 +6,15 @@ import App from './App.jsx'
 import {BrowserRouter} from 'react-router-dom'
 
 import { AutoProvider } from './context/AutoContext.jsx'
+import { ChatProvider } from './context/ChatContext.jsx'
 
 createRoot(document.getElementById('root')).render(
  
   <BrowserRouter>
     <AutoProvider>
-     <App />
+      <ChatProvider>
+            <App />
+      </ChatProvider>
     </AutoProvider>
 
   </BrowserRouter>

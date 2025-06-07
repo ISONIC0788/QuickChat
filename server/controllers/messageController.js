@@ -6,38 +6,38 @@ import User from "../models/User.js";
 
 import {io , userSockepMap} from "../server.js"
 
- export const getUsersForSidebar = async (req , res ) =>{
-     try {
-        const userId = req.user._Id ; 
+ export const getUsersForSidebar = async (req, res) => {
+  try {
+    const userId = req.user._id;
 
-        const filteredUsers = await User.find({_id: {$ne: userId}}).select("-password"); //  $ne not equal and then remove password from the result 
+    const filteredUsers = await User.find({ _id: { $ne: userId } }).select("-password");
 
-        // count number of message not seen 
+    const unseenMessages = {};
 
-        const unseenMessages = {};
+    const promises = filteredUsers.map(async (user) => {
+      const messages = await Message.find({
+        senderId: user._id,
+        receiverId: userId,
+        seen: false,
+      });
 
-        const promises = filteredUsers.map( async (user) =>{
+      if (messages.length > 0) {
+        unseenMessages[user._id] = messages.length;
+      }
+    });
 
-            const messages = await Message.find({senderId: user._id , receiverId: userId , seen: false});
+    await Promise.all(promises); // ✅ Wait for all message checks to complete
 
-            if(messages.length > 0){
-                unseenMessages [user._id] = messages.length ;
-            }
-
-            // to excute all promisses 
-           await Promise.all(promises)
-
-
-           res.json({success: true , users : filteredUsers , unseenMessages});
-
-        })
-
-
-     }catch(error){
-          console.log(error.messages);
-           res.json({success: false , message: error.message});
-     }
- }
+    return res.json({
+      success: true,
+      users: filteredUsers,
+      unseenMessages,
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.json({ success: false, message: error.message });
+  }
+};
 
 
 // controller to get all messages for selected user 
@@ -54,6 +54,10 @@ export const getMessages  = async (req , res ) =>{
             $or: [
                 {senderId: myId , receiverId : selectedUserId} , // messaeg for my my id 
                 {senderId: myId , receiverId : selectedUserId},  // message for selected use id 
+
+                // { senderId: myId, receiverId: selectedUserId },
+                // { senderId: selectedUserId, receiverId: myId }
+
             ]
         });
 
@@ -118,7 +122,9 @@ export const sendMessage = async (req , res ) =>{
          const receiverSockeId = userSockepMap[receiverId];
 
          if (receiverSockeId){
-            io.to(receiverSockeId).emit("new message " , newMessage)
+            // io.to(receiverSockeId).emit("new message " , newMessage)
+            io.to(receiverSockeId).emit("newMessages", newMessage);
+
          }
 
 

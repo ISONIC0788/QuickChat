@@ -12,7 +12,7 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 // axion us base url 
 
-axios.defaults.baseURL = backendUrl;
+axios.defaults.baseURL = backendUrl; // allow to add default backen url
 export const AutoContext = createContext();
 
 export const AutoProvider = ({children}) =>{
