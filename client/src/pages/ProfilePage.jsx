@@ -75,7 +75,7 @@ function ProfilePage() {
                 text-white border-none text-sm font-light py-2 px-20 rounded-full cursor-pointer'>Save</button>
            </form>
            <img className={`max-w-44 aspect-square rounded-full max-10 max-sm:mt-10
-            ${selectImg && 'rounded-full'}`} src={assets.logo_icon} alt="" srcset="" />
+            ${selectImg && 'rounded-full'}`} src={authUser?.profilePic || assets.logo_icon} alt="" srcset="" />
 
             {/* {toast.error(localStorage.getItem('error'))} */}
         </div>
