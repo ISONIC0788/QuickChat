@@ -56,10 +56,13 @@ export const ChatProvider = ({children}) =>{
                 setMessages((prevMessages)=>[...prevMessages , data.newMessage]);
              }else{
                 toast.error(data.messages)
+                
              }
 
         }catch(error){
             toast.error(error.message)
+            toast.error(error.message || "Something went wrong");
+
         }
 
      }
@@ -88,7 +91,7 @@ export const ChatProvider = ({children}) =>{
 
 
     const unsubscribeFromMessages  = () =>{
-        if(socket)  socket.off("newMassages");
+        if(socket)  socket.off("newMessages");
     }
 
     useEffect(()=>{

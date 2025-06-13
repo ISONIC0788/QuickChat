@@ -54,8 +54,8 @@ function Sidebar() {     // {seletedUser , setSelectedUser}  this i for selected
                     <p>{user.fullName}</p>
                     {
                         // index < 3 for static data
-                        // onlineUser.includes(user._id)
-                        (onlineUser || []).includes(user._id)
+                        onlineUser.includes(user._id)
+                        // (onlineUser || []).includes(user._id)
 
                         ? <span className='text-green-400 text-xs'>Online</span>
                         : <span className='text-neutral-400 text-xs'>Offline</span>
